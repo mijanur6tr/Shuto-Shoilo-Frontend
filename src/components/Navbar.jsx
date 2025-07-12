@@ -168,11 +168,11 @@ export const Navbar = ({ setDisplaySignin }) => {
       >
         <X className="w-6 h-6" />
       </button>
-          <Link to='/' onClick={()=>isOpen(false)} className="block text-gray-700 hover:text-indigo-600">Home</Link>
-          <Link to="/shoilo" onClick={()=>isOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Shoilo</Link>
-          <Link to="/bangle" onClick={()=>isOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Bangles</Link>
-          <Link to="/rings" onClick={()=>isOpen(false)} className="block text-gray-700 hover:text-indigo-600">Rings</Link>
-          <Link to="/bookmark" onClick={()=>isOpen(false)} className="block text-gray-700 hover:text-indigo-600">Bookmarks</Link>
+          <Link to='/' onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Home</Link>
+          <Link to="/shoilo" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Shoilo</Link>
+          <Link to="/bangle" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Bangles</Link>
+          <Link to="/rings" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Rings</Link>
+          <Link to="/bookmark" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Bookmarks</Link>
         </div>
       )}
     </nav>
