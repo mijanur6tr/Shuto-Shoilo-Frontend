@@ -31,7 +31,7 @@ export const Session = (props) => {
   }
 
   return (
-    <div className='p-25 min-h-[60vh] flex items-center justify-center '>
+    <div className='p-25 min-h-[60vh] flex flex-col gap-5 items-center justify-center '>
       <h1>Cash on Delivery</h1>
       <form
         onSubmit={onSubmitHandler}
