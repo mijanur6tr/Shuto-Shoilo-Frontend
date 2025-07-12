@@ -1,9 +1,8 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { ContextStore } from '../context/contextStore'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify';
-
+import { toast } from 'react-toastify'
 
 export const Session = (props) => {
   const navigate = useNavigate()
@@ -12,15 +11,44 @@ export const Session = (props) => {
 
   const [success, setSuccess] = useState("")
 
+  const cancelOrder = async () => {
+    try {
+      await axios.post(url + "/api/order/verify", { orderId, success: "false" }, { headers: { token } });
+      setCartItem("")
+      localStorage.removeItem("orderId")
+      toast.info("Order cancelled due to navigation")
+    } catch (error) {
+      console.log("Error cancelling order", error.message)
+    }
+  }
+
+  useEffect(() => {
+    // Handle browser/tab close or refresh
+    const handleBeforeUnload = (e) => {
+      cancelOrder();
+      // Standard: prevent default
+      e.preventDefault()
+      e.returnValue = ''
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    // Handle React route change/unmount
+    return () => {
+      cancelOrder()
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [])  // run once on mount
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(url + "/api/order/verify", { orderId, success }, { headers: { token } })
       if (response.data.success) {
-
         navigate("/my-order")
         toast.success("Order Placed")
         setCartItem("")
+        localStorage.removeItem("orderId")
       } else {
         navigate("/")
         toast.error("Order Cancelled")
