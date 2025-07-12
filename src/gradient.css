@@ -1,0 +1,18 @@
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animated-gradient {
+  background: linear-gradient(
+    270deg,
+    #0f172a,  /* slate-900 (very dark blue slate) */
+    #1e293b,  /* slate-800 */
+    #1c1f24,  /* almost black slate */
+    #334155,  /* slate-700 */
+    #0f172a   /* slate-900 again for loop */
+  );
+  background-size: 600% 600%;
+  animation: gradientShift 15s ease infinite;
+}
