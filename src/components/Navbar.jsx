@@ -171,7 +171,7 @@ export const Navbar = ({ setDisplaySignin }) => {
           <Link to='/' onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Home</Link>
           <Link to="/shoilo" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Shoilo</Link>
           <Link to="/bangle" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Bangles</Link>
-          <Link to="/rings" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Rings</Link>
+          <Link to="/ring" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Rings</Link>
           <Link to="/bookmark" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Bookmarks</Link>
         </div>
       )}
