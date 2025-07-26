@@ -57,9 +57,6 @@ const ContextStoreProvider = (props) => {
         try {
             const response = await axios.get(`${url}/api/product/list`)
 
-               // Simulate a 2-second delay
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
             setItemList(response.data.data)
         } catch (error) {
             console.log(error.message)
