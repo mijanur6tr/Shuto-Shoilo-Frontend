@@ -10,6 +10,7 @@ const ContextStoreProvider = (props) => {
     const [itemList, setItemList] = useState([])
     const [token, setToken] = useState("")
     const [orderId,setOrderId] = useState("")
+    const [loading,setLoading] = useState(true)
     const url = import.meta.env.VITE_BACKEND_URL
 
 
@@ -55,9 +56,15 @@ const ContextStoreProvider = (props) => {
     const fetchItemList = async () => {
         try {
             const response = await axios.get(`${url}/api/product/list`)
+
+               // Simulate a 2-second delay
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
             setItemList(response.data.data)
         } catch (error) {
             console.log(error.message)
+        }finally{
+            setLoading(false)
         }
     }
 
@@ -99,7 +106,8 @@ const ContextStoreProvider = (props) => {
         token,
         setToken,
         orderId,
-        setOrderId
+        setOrderId,
+        loading
     }
 
     return (

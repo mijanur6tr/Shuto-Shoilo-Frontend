@@ -11,34 +11,8 @@ export const Session = (props) => {
 
   const [success, setSuccess] = useState("")
 
-  const cancelOrder = async () => {
-    try {
-      await axios.post(url + "/api/order/verify", { orderId, success: "false" }, { headers: { token } });
-      setCartItem("")
-      localStorage.removeItem("orderId")
-      toast.info("Order cancelled due to navigation")
-    } catch (error) {
-      console.log("Error cancelling order", error.message)
-    }
-  }
 
-  useEffect(() => {
-    // Handle browser/tab close or refresh
-    const handleBeforeUnload = (e) => {
-      cancelOrder();
-      // Standard: prevent default
-      e.preventDefault()
-      e.returnValue = ''
-    }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    // Handle React route change/unmount
-    return () => {
-      cancelOrder()
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [])  // run once on mount
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
