@@ -1,180 +1,183 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Logo } from './Logo';
-import { Menu, X, ShoppingCart, LogOut, UserCircle, ShoppingBag } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Menu, X, ShoppingBag, LogOut, UserCircle } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ContextStore } from '../context/contextStore';
-import { useNavigate } from 'react-router-dom';
 
 export const Navbar = ({ setDisplaySignin }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(false);
-  const { totalProductAmount, token, setToken } = useContext(ContextStore)
-  const cartAmount = totalProductAmount();
-  const navigate = useNavigate()
+  const [scrolled, setScrolled] = useState(false);
+  const { totalProductAmount, token, setToken, cartItem } = useContext(ContextStore);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Calculate total item quantity in cart
+  const cartItemCount = Object.values(cartItem || {}).reduce((acc, qty) => acc + (qty > 0 ? qty : 0), 0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setToken("")
-    navigate("/")
+    setToken("");
+    navigate("/");
   };
 
-  const handleOrder = () => {
-    navigate("/my-order")
-  }
+  const navLinks = [
+    { name: 'Home', path: '/' },
+    { name: 'Menu', path: '/#menu' },
+    { name: 'Philosophy', path: '/#philosophy' },
+    { name: 'Origin', path: '/#origin' },
+  ];
+
+  const handleNavClick = (path) => {
+    setIsOpen(false);
+    if (path.startsWith('/#')) {
+      const elementId = path.replace('/#', '');
+      const el = document.getElementById(elementId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        navigate('/');
+        setTimeout(() => {
+          const target = document.getElementById(elementId);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+    } else {
+      navigate(path);
+    }
+  };
 
   return (
-    <nav className="bg-white shadow-md fixed w-full top-0 left-0 z-50">
-      <div className="  mx-auto px-2 sm:px-4 md:px-8 xl:px-18 py-2 flex items-center justify-between">
-
-        <Link to="/">
-          <div className="flex items-center">
-            <Logo />
-          </div>
+    <header className="fixed top-0 left-0 w-full z-50 transition-all duration-500 py-3 sm:py-5 px-4 sm:px-8">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        
+        {/* Left: Brand Logo in bold uppercase with hyphen prefix */}
+        <Link to="/" className="flex items-center">
+          <Logo />
         </Link>
 
+        {/* Center: Pill-shaped navigation bar with blur(20px) and semi-transparent bg */}
+        <nav 
+          style={{
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.18)',
+            borderColor: 'rgba(1, 71, 46, 0.12)'
+          }}
+          className="hidden md:flex items-center gap-7 px-8 py-2.5 rounded-full border shadow-forest-sm transition-all duration-300"
+        >
+          {navLinks.map((link) => (
+            <button
+              key={link.name}
+              onClick={() => handleNavClick(link.path)}
+              className="text-[#01472e] font-inter font-bold text-[10px] uppercase tracking-[0.25em] hover:opacity-70 transition-opacity cursor-pointer"
+            >
+              {link.name}
+            </button>
+          ))}
+        </nav>
 
-
-        <div className="hidden md:flex items-center space-x-6 text-gray-700 font-medium">
-          <Link to='/' className="hover:text-indigo-600 text-lg transition">Home</Link>
-          <Link to="/shoilo" className="hover:text-indigo-600 text-lg transition">Shoilo</Link>
-          <Link to="/bangle" className="hover:text-indigo-600 text-lg transition">Bangles</Link>
-          <Link to="/ring" className="hover:text-indigo-600 text-lg transition">Rings</Link>
-          <Link to="/bookmark" className="hover:text-indigo-600 text-lg transition">Bookmarks</Link>
-          <Link to="/cart" className="relative">
-            <ShoppingCart className="w-6 h-6 hover:text-indigo-600 cursor-pointer" />
-
-            {cartAmount > 0 && (
-              <div className="absolute -top-1 -right-1 w-3 h-3  bg-blue-500 rounded-full border-2 border-white" />
-            )}
-          </Link>
-
-          {!token ? (<button
-            onClick={() => setDisplaySignin(true)}
-            className="bg-indigo-600 text-white px-4 py-1.5 rounded-md hover:bg-indigo-700 transition"
+        {/* Right: Cart Button in White Pill with Numeric Badge & Account */}
+        <div className="flex items-center gap-3">
+          
+          <Link
+            to="/cart"
+            className="flex items-center gap-2.5 bg-white text-[#01472e] px-4 py-2 rounded-full shadow-forest-sm hover:scale-105 transition-all duration-300 border border-[#01472e]/10 group"
           >
-            Sign In
-          </button>)
-            :
-            (
-              <div className="relative inline-block">
-                {/* Profile Icon */}
-                <UserCircle
-                  className="w-8 h-8 text-gray-700 cursor-pointer"
-                  onClick={() => setOpenDropdown((prev) => !prev)}
-                />
-
-                {/* Dropdown */}
-                {openDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border z-10 animate-fadeSlide">
-                    <div className="p-2 space-y-1">
-                      {/* Orders */}
-                      <div
-                        onClick={() => {
-                          setOpenDropdown(false);
-                          setTimeout(() => {
-                            navigate("/my-order");
-                          }, 100);
-                        }}
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition cursor-pointer"
-                      >
-                        <ShoppingBag className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm text-gray-800">Orders</span>
-                      </div>
-
-
-                      {/* Logout */}
-                      <div
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-red-100 transition cursor-pointer"
-                        onClick={handleLogout}
-                      >
-                        <LogOut className="w-4 h-4 text-red-600" />
-                        <span className="text-sm text-red-600">Logout</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          }
-
-
-        </div>
-
-
-        <div className="md:hidden flex items-center space-x-4">
-          <Link to="/cart" className="relative">
-            <ShoppingCart className="w-6 h-6 hover:text-indigo-600 cursor-pointer" />
-
-            {cartAmount > 0 && (
-              <div className="absolute -top-1 -right-1 w-3 h-3  bg-blue-500 rounded-full border-2 border-white" />
-            )}
+            <span className="font-inter font-bold text-[10px] uppercase tracking-[0.2em] hidden sm:inline">
+              Cart
+            </span>
+            <div className="w-5 h-5 rounded-full bg-[#01472e] text-[#ccd5ae] flex items-center justify-center text-[10px] font-bold font-inter">
+              {cartItemCount}
+            </div>
           </Link>
 
-          {!token ? (<button onClick={() => setDisplaySignin(true)} className="bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition text-sm">
-            Sign In
-          </button>) :
-            (
-              <div className="relative inline-block">
-                {/* Profile Icon */}
-                <UserCircle
-                  className="w-8 h-8 text-gray-700 cursor-pointer"
-                  onClick={() => setOpenDropdown((prev) => !prev)}
-                />
+          {!token ? (
+            <button
+              onClick={() => setDisplaySignin(true)}
+              className="bg-[#01472e] text-[#fefae0] font-inter font-bold text-[10px] uppercase tracking-[0.25em] px-4 py-2.5 rounded-full hover:bg-[#01472e]/90 transition-all duration-300 shadow-forest-sm cursor-pointer"
+            >
+              Sign In
+            </button>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setOpenDropdown((prev) => !prev)}
+                className="w-9 h-9 rounded-full bg-white text-[#01472e] flex items-center justify-center border border-[#01472e]/15 shadow-sm hover:scale-105 transition-transform cursor-pointer"
+              >
+                <UserCircle className="w-5 h-5 text-[#01472e]" />
+              </button>
 
-                {/* Dropdown */}
-                {openDropdown && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md border z-10 animate-fadeSlide">
-                    <div className="p-2 space-y-1">
-                      {/* Orders */}
-                      <div
-                        onClick={() => {
-                          navigate("/my-order");
-                          setOpenDropdown(false)
-                        }}
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-100 transition cursor-pointer">
-                        <ShoppingBag className="w-4 h-4 text-gray-600" />
-                        <span className="text-sm text-gray-800">Orders</span>
-                      </div>
+              {openDropdown && (
+                <div className="absolute right-0 mt-3 w-44 bg-[#fefae0] border border-[#01472e]/20 rounded-2xl shadow-forest p-2 z-50">
+                  <button
+                    onClick={() => {
+                      setOpenDropdown(false);
+                      navigate("/my-order");
+                    }}
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-[#ccd5ae]/40 text-[#01472e] text-xs font-inter font-semibold uppercase tracking-wider transition cursor-pointer"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    Orders
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-red-50 text-red-700 text-xs font-inter font-semibold uppercase tracking-wider transition cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-                      {/* Logout */}
-                      <div
-                        className="flex items-center gap-2 p-2 rounded-md hover:bg-red-100 transition cursor-pointer"
-                        onClick={handleLogout}
-                      >
-                        <LogOut className="w-4 h-4 text-red-600" />
-                        <span className="text-sm text-red-600">Logout</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )
-          }
-
-
-          <button onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? <></> : <Menu className="w-6 h-6" />}
+          {/* Mobile Menu Toggle Button */}
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="md:hidden p-2 rounded-full bg-white/80 backdrop-blur-md text-[#01472e] border border-[#01472e]/10 shadow-sm"
+          >
+            {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
-
       </div>
 
-
+      {/* Mobile Drawer */}
       {isOpen && (
-        <div className="md:hidden fixed top-0 right-0 w-64 h-full bg-white shadow-lg z-50 p-6 space-y-4 transform transition-transform duration-300 translate-x-0">
+        <div 
+          style={{
+            backdropFilter: 'blur(25px)',
+            WebkitBackdropFilter: 'blur(25px)',
+            backgroundColor: 'rgba(254, 250, 224, 0.95)'
+          }}
+          className="md:hidden fixed top-20 right-4 left-4 p-6 rounded-3rem border border-[#01472e]/15 shadow-forest z-50 flex flex-col gap-4 animate-reveal"
+        >
+          {navLinks.map((link) => (
             <button
-        onClick={() => setIsOpen(false)}
-        className="absolute top-4 right-4 text-gray-600 hover:text-red-500"
-      >
-        <X className="w-6 h-6" />
-      </button>
-          <Link to='/' onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Home</Link>
-          <Link to="/shoilo" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Shoilo</Link>
-          <Link to="/bangle" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600 scroll-smooth">Bangles</Link>
-          <Link to="/ring" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Rings</Link>
-          <Link to="/bookmark" onClick={()=>setIsOpen(false)} className="block text-gray-700 hover:text-indigo-600">Bookmarks</Link>
+              key={link.name}
+              onClick={() => handleNavClick(link.path)}
+              className="text-left text-[#01472e] font-inter font-bold text-xs uppercase tracking-[0.25em] py-2 border-b border-[#01472e]/10"
+            >
+              {link.name}
+            </button>
+          ))}
+          <Link
+            to="/cart"
+            onClick={() => setIsOpen(false)}
+            className="text-left text-[#01472e] font-inter font-bold text-xs uppercase tracking-[0.25em] py-2 border-b border-[#01472e]/10"
+          >
+            View Cart ({cartItemCount})
+          </Link>
         </div>
       )}
-    </nav>
+    </header>
   );
 };

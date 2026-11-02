@@ -9,7 +9,7 @@ export const Home = (props) => {
     <>
     <Hero/>
     <Category category={category} setCategory={setCategory}/>
-    <Product category={category}/>
+    <Product category={category} setCategory={setCategory}/>
     </>
    )
   }

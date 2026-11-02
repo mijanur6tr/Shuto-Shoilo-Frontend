@@ -1,26 +1,43 @@
-import React, { useContext } from 'react'
-import { Item } from '../components'
-import { ContextStore } from '../context/contextStore'
+import React, { useContext } from 'react';
+import { Item } from '../components';
+import { ContextStore } from '../context/contextStore';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 export const Bookmark = () => {
-  const { itemList  } = useContext(ContextStore)
-
-  const selectedItemList = itemList.filter((item) => item.category === "Classic Bookmarks")
+  const { itemList } = useContext(ContextStore);
+  const selectedItemList = itemList.filter((item) => 
+    item.category?.includes("Tonics") || item.category === "Botanical Tonics"
+  );
 
   return (
-    <div className="px-3 pt-15 sm:px-6 lg:px-8 xl:mx-15">
-      <h2 className="py-16 font-bold text-center text-3xl sm:text-4xl">
-        Make Your Purchase to beautify Your <span className="text-red-600">LOVE</span>
-      </h2>
+    <div className="min-h-screen bg-[#ccd5ae] pt-28 pb-20 px-4 sm:px-8 text-[#01472e]">
+      <div className="max-w-7xl mx-auto">
+        <Link 
+          to="/" 
+          className="inline-flex items-center gap-2 font-inter font-bold text-xs uppercase tracking-[0.25em] text-[#01472e] hover:opacity-75 mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" /> Return to Menu
+        </Link>
 
-      <div className="grid gap-6 pb-20 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {selectedItemList.map((item) => (
-          <Item
-            key={item._id}
-           {...item}
-          />
-        ))}
+        <div className="mb-12 text-center">
+          <span className="text-[10px] font-bold uppercase tracking-[0.35em] font-inter text-[#01472e]/70 block mb-1">
+            - DISCIPLINE 04
+          </span>
+          <h1 className="font-anton text-4xl sm:text-6xl uppercase tracking-tight text-[#01472e]">
+            BOTANICAL TONICS
+          </h1>
+          <p className="font-inter text-xs uppercase tracking-[0.2em] text-[#01472e]/80 max-w-md mx-auto mt-2">
+            Adaptogenic elixirs, raw medicinal mushroom infusions, and wild cold-pressed extracts.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {selectedItemList.map((item) => (
+            <Item key={item._id} {...item} />
+          ))}
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
